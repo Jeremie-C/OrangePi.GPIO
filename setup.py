@@ -42,4 +42,4 @@ setup(name             = 'OPi.GPIO',
       url              = 'https://github.com/Jeremie-C/OrangePi.GPIO',
       classifiers      = classifiers,
       packages         = ['OPi'],
-      ext_modules = [Extension('OPi.GPIO', ['source/py_gpio.c', 'source/c_gpio.c', 'source/boards.c', 'source/common.c', 'source/constants.c', 'source/soft_pwm.c', 'source/py_pwm.c'])])
+      ext_modules = [Extension('OPi.GPIO', ['source/py_gpio.c', 'source/c_gpio.c', 'source/boards.c', 'source/common.c', 'source/constants.c', 'source/soft_pwm.c', 'source/py_pwm.c', 'source/event_gpio.c'])])
