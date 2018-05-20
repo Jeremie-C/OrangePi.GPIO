@@ -39,9 +39,6 @@ void define_constants(PyObject *module)
 	input = Py_BuildValue("i", INPUT);
 	PyModule_AddObject(module, "IN", input);
 
-	unknown = Py_BuildValue("i", MODE_UNKNOWN);
-	PyModule_AddObject(module, "UNKNOWN", unknown);
-
 	board = Py_BuildValue("i", BOARD);
 	PyModule_AddObject(module, "BOARD", board);
 
@@ -50,6 +47,15 @@ void define_constants(PyObject *module)
 
 	soc = Py_BuildValue("i", MODE_SOC);
 	PyModule_AddObject(module, "SOC", soc);
+
+	pud_off = Py_BuildValue("i", PUD_OFF + PY_PUD_CONST_OFFSET);
+	PyModule_AddObject(module, "PUD_OFF", pud_off);
+
+	pud_up = Py_BuildValue("i", PUD_UP + PY_PUD_CONST_OFFSET);
+	PyModule_AddObject(module, "PUD_UP", pud_up);
+
+	pud_down = Py_BuildValue("i", PUD_DOWN + PY_PUD_CONST_OFFSET);
+	PyModule_AddObject(module, "PUD_DOWN", pud_down);
 
 	bunknown = Py_BuildValue("i", BOARD_UNKNOWN);
 	PyModule_AddObject(module, "BUNKNOWN", bunknown);
@@ -75,28 +81,14 @@ void define_constants(PyObject *module)
 	bpcplus = Py_BuildValue("i", PCPLUS);
 	PyModule_AddObject(module, "PCPLUS", bpcplus);
 
-	pud_off = Py_BuildValue("i", PUD_OFF + PY_PUD_CONST_OFFSET);
-	PyModule_AddObject(module, "PUD_OFF", pud_off);
-
-	pud_up = Py_BuildValue("i", PUD_UP + PY_PUD_CONST_OFFSET);
-	PyModule_AddObject(module, "PUD_UP", pud_up);
-
-	pud_down = Py_BuildValue("i", PUD_DOWN + PY_PUD_CONST_OFFSET);
-	PyModule_AddObject(module, "PUD_DOWN", pud_down);
-
 	version = Py_BuildValue("s", "0.6.3");
 	PyModule_AddObject(module, "VERSION", version);
 
 	PyModule_AddObject(module, "PA", Py_BuildValue("i", 0));
-	PyModule_AddObject(module, "PB", Py_BuildValue("i", 32));
 	PyModule_AddObject(module, "PC", Py_BuildValue("i", 64));
 	PyModule_AddObject(module, "PD", Py_BuildValue("i", 96));
 	PyModule_AddObject(module, "PE", Py_BuildValue("i", 128));
 	PyModule_AddObject(module, "PF", Py_BuildValue("i", 160));
 	PyModule_AddObject(module, "PG", Py_BuildValue("i", 192));
-	PyModule_AddObject(module, "PH", Py_BuildValue("i", 224));
-	PyModule_AddObject(module, "PI", Py_BuildValue("i", 256));
-	PyModule_AddObject(module, "PJ", Py_BuildValue("i", 288));
-	PyModule_AddObject(module, "PK", Py_BuildValue("i", 320));
-	PyModule_AddObject(module, "PL", Py_BuildValue("i", 352));	
+	PyModule_AddObject(module, "PL", Py_BuildValue("i", 352));
 }

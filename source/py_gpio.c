@@ -22,6 +22,8 @@ SOFTWARE.
 
 #include "Python.h"
 #include "c_gpio.h"
+#include "py_pwm.h"
+#include "boards.h"
 #include "common.h"
 #include "constants.h"
 
@@ -270,6 +272,45 @@ static PyObject *py_input_gpio(PyObject *self, PyObject *args)
    return value;
 }
 
+// python function value = gpio_function(channel)
+static PyObject *py_gpio_function(PyObject *self, PyObject *args)
+{
+  unsigned int gpio;
+  int channel;
+  int f;
+  int fn;
+  PyObject *func;
+
+  if (!PyArg_ParseTuple(args, "i", &channel))
+    return NULL;
+
+  if (get_gpio_number(channel, &gpio))
+    return NULL;
+
+  if (mmap_gpio_mem())
+    return NULL;
+
+  f = gpio_function(gpio);
+
+  switch (f)
+  {
+    case 0 : fn = INPUT;  break;
+    case 1 : fn = OUTPUT; break;
+    case 2 : //010
+      fn = ALT_2;
+      break;
+    case 3 : //011
+      fn = ALT_3;
+      break;
+    case 6 : //110
+      fn = ALT_6;
+      break;
+    default : fn = ALT_UNKNOWN; break;
+  }
+
+  func = Py_BuildValue("i", fn);
+  return func;
+}
 // python function cleanup(channel=None)
 static PyObject *py_cleanup(PyObject *self, PyObject *args, PyObject *kwargs)
 {
@@ -289,13 +330,11 @@ static PyObject *py_cleanup(PyObject *self, PyObject *args, PyObject *kwargs)
     if (channel == -666) {
       // clean up any /sys/class exports
       //event_cleanup_all();
-
       // set everything back to input
       for (i=0; i<383; i++) {
-
         if (gpio_direction[i] != -1) {
-          //printf("Clean %d \n",i);
-          setup_gpio(*(*pin_to_gpio + i), INPUT, PUD_OFF); //take care
+          //printf("Clean %d\n",i);
+          setup_gpio(i, INPUT, PUD_OFF); //take care
           gpio_direction[i] = -1;
           found = 1;
           //printf("Clean Fnished %d \n",i);
@@ -304,7 +343,6 @@ static PyObject *py_cleanup(PyObject *self, PyObject *args, PyObject *kwargs)
     } else {
       // clean up any /sys/class exports
       // event_cleanup(sys_gpio);
-
       // set everything back to input
       if (gpio_direction[gpio] != -1) {
         setup_gpio(gpio, INPUT, PUD_OFF);
@@ -333,6 +371,7 @@ PyMethodDef opi_gpio_methods[] = {
   {"cleanup", (PyCFunction)py_cleanup, METH_VARARGS | METH_KEYWORDS, "Clean up by resetting all GPIO channels that have been used by this program to INPUT with no pullup/pulldown and no event detection\n[channel] - individual channel to clean up.  Default - clean every channel that has been used."},
   {"output", py_output_gpio, METH_VARARGS, "Output to a GPIO channel\nchannel - either board pin number or BCM number depending on which mode is set.\nvalue   - 0/1 or False/True or LOW/HIGH"},
   {"input", py_input_gpio, METH_VARARGS, "Input from a GPIO channel.  Returns HIGH=1=True or LOW=0=False\nchannel - either board pin number or BCM number depending on which mode is set."},
+  {"gpio_function", py_gpio_function, METH_VARARGS, "Return the current GPIO function (IN, OUT, PWM, SERIAL, I2C, SPI)\nchannel - either board pin number or GPIO number depending on which mode is set."},
   {NULL, NULL, 0, NULL}
 };
 
@@ -369,6 +408,18 @@ PyMODINIT_FUNC initGPIO(void)
     gpio_direction[i] = -1;
 
   // Add PWM class
+  if (PWM_init_PWMType() == NULL)
+#if PY_MAJOR_VERSION > 2
+    return NULL;
+#else
+    return;
+#endif
+
+  Py_INCREF(&PWMType);
+  PyModule_AddObject(module, "PWM", (PyObject*)&PWMType);
+
+  if (!PyEval_ThreadsInitialized())
+    PyEval_InitThreads();
 
   // register exit functions - last declared is called first
   if (Py_AtExit(cleanup) != 0)

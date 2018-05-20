@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013-2015 Ben Croston
+Copyright (c) 2013 Ben Croston
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -20,32 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#define BOARD_UNKNOWN  -1
-#define ZERO            1
-#define ZEROPLUS        1
-#define ZEROPLUS2H5     1
-#define R1              1
-#define ZEROPLUS2H3     2
-#define PC              3
-#define PCPLUS          3
+/* Software PWM using threads */
 
-#define MODE_UNKNOWN   -1
-#define BOARD          10
-#define BCM            11
-#define MODE_SOC       12
-
-#define ALT_UNKNOWN    -1
-#define ALT_2          2
-#define ALT_3          3
-#define ALT_6          6
-
-int board_type;
-int gpio_mode;
-const int (*pin_to_gpio)[41];
-
-int gpio_direction[383];
-int setup_error;
-int module_setup;
-
-int get_gpio_number(int channel, unsigned int *gpio);
-int check_gpio_priv(void);
+void pwm_set_duty_cycle(unsigned int gpio, float dutycycle);
+void pwm_set_frequency(unsigned int gpio, float freq);
+void pwm_start(unsigned int gpio);
+void pwm_stop(unsigned int gpio);
