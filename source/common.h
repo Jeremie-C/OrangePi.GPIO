@@ -28,6 +28,11 @@ SOFTWARE.
 #define ZEROPLUS2H3     2
 #define PC              3
 #define PCPLUS          3
+#define ONE             3
+#define LITE            3
+#define PLUS2E          3
+#define PC2             4
+#define PRIME           5
 
 #define MODE_UNKNOWN   -1
 #define BOARD          10

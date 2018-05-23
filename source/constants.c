@@ -40,15 +40,6 @@ void define_constants(PyObject *module)
 	input = Py_BuildValue("i", INPUT);
 	PyModule_AddObject(module, "IN", input);
 
-	board = Py_BuildValue("i", BOARD);
-	PyModule_AddObject(module, "BOARD", board);
-
-	bcm = Py_BuildValue("i", BCM);
-	PyModule_AddObject(module, "BCM", bcm);
-
-	soc = Py_BuildValue("i", MODE_SOC);
-	PyModule_AddObject(module, "SOC", soc);
-
 	pud_off = Py_BuildValue("i", PUD_OFF + PY_PUD_CONST_OFFSET);
 	PyModule_AddObject(module, "PUD_OFF", pud_off);
 
@@ -67,29 +58,37 @@ void define_constants(PyObject *module)
 	both_edge = Py_BuildValue("i", BOTH_EDGE + PY_EVENT_CONST_OFFSET);
 	PyModule_AddObject(module, "BOTH", both_edge);
 
+	board = Py_BuildValue("i", BOARD);
+	PyModule_AddObject(module, "BOARD", board);
+
+	bcm = Py_BuildValue("i", BCM);
+	PyModule_AddObject(module, "BCM", bcm);
+
+	soc = Py_BuildValue("i", MODE_SOC);
+	PyModule_AddObject(module, "SOC", soc);
+
 	bunknown = Py_BuildValue("i", BOARD_UNKNOWN);
 	PyModule_AddObject(module, "BUNKNOWN", bunknown);
 
 	bzeroh2 = Py_BuildValue("i", ZERO);
 	PyModule_AddObject(module, "ZERO", bzeroh2);
-
-	br1 = Py_BuildValue("i", R1);
-	PyModule_AddObject(module, "R1", br1);
-
-	bzeroplus = Py_BuildValue("i", ZEROPLUS);
-	PyModule_AddObject(module, "ZEROPLUS", bzeroplus);
-
-	bzeroplus5 = Py_BuildValue("i", ZEROPLUS2H5);
-	PyModule_AddObject(module, "ZEROPLUS2H5", bzeroplus5);
+	PyModule_AddObject(module, "R1", bzeroh2);
+	PyModule_AddObject(module, "ZEROPLUS", bzeroh2);
+	PyModule_AddObject(module, "ZEROPLUS2H5", bzeroh2);
 
 	bzeroplus3 = Py_BuildValue("i", ZEROPLUS2H3);
 	PyModule_AddObject(module, "ZEROPLUS2H3", bzeroplus3);
 
 	bpc = Py_BuildValue("i", PC);
 	PyModule_AddObject(module, "PC", bpc);
+	PyModule_AddObject(module, "PCPLUS", bpc);
+	PyModule_AddObject(module, "PLUS2E", bpc);
 
-	bpcplus = Py_BuildValue("i", PCPLUS);
-	PyModule_AddObject(module, "PCPLUS", bpcplus);
+	bpc2 = Py_BuildValue("i", PC2);
+	PyModule_AddObject(module, "PC2", bpc2);
+
+	bprime = Py_BuildValue("i", PRIME);
+	PyModule_AddObject(module, "PRIME", bprime);
 
 	version = Py_BuildValue("s", "0.6.3");
 	PyModule_AddObject(module, "VERSION", version);
