@@ -83,11 +83,12 @@ static PyObject *py_setopi(PyObject *self, PyObject *args)
 
   //here is the 'pin_to_gpio' initialization
   switch (board_type) {
-    case 1 : pin_to_gpio = &pin_to_gpio_zero; break;
-    case 2 : pin_to_gpio = &pin_to_gpio_zero2; break;
-    case 3 : pin_to_gpio = &pin_to_gpio_pc; break;
-    case 4 : pin_to_gpio = &pin_to_gpio_pc2; break;
-    case 5 : pin_to_gpio = &pin_to_gpio_prime; break;
+    case 1 :
+    case 2 : pin_to_gpio = &pin_to_gpio_zero; break;
+    case 3 : pin_to_gpio = &pin_to_gpio_zero2; break;
+    case 4 : pin_to_gpio = &pin_to_gpio_pc; break;
+    case 5 : pin_to_gpio = &pin_to_gpio_pc2; break;
+    case 6 : pin_to_gpio = &pin_to_gpio_prime; break;
   }
 
   Py_RETURN_NONE;
@@ -177,7 +178,7 @@ static PyObject *py_setup_channel(PyObject *self, PyObject *args, PyObject *kwar
   int pud = PUD_OFF + PY_PUD_CONST_OFFSET;
   int initial = -1;
   static char *kwlist[] = {"channel", "direction", "pull_up_down", "initial", NULL};
-  int func;
+  int func, fn;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ii|ii", kwlist, &channel, &direction, &pud, &initial))
     return NULL;
@@ -212,7 +213,14 @@ static PyObject *py_setup_channel(PyObject *self, PyObject *args, PyObject *kwar
     return NULL;
 
   func = gpio_function(gpio);
-  if (gpio_warnings && ((func != 0 && func != 1) || (gpio_direction[gpio] == -1 && func == 1)))
+  /* Prevent Break of SPI, TWI, UART,... */
+  if (func != 0 && func != 1) {
+    fn = gpio_function_name(gpio, func, board_type);
+    PyErr_Format(PyExc_ValueError, "This channel is already in use by system as %s.", FUNCTIONS[fn]);
+    return NULL;
+  }
+
+  if (gpio_warnings && (gpio_direction[gpio] == -1 && func == 1))
   {
     PyErr_Warn(NULL, "This channel is already in use, continuing anyway. Use GPIO.setwarnings(False) to disable warnings.");
   }
@@ -307,21 +315,47 @@ static PyObject *py_gpio_function(PyObject *self, PyObject *args)
   {
     case 0 : fn = INPUT;  break;
     case 1 : fn = OUTPUT; break;
-    case 2 : //010
-      fn = ALT_2;
-      break;
-    case 3 : //011
-      fn = ALT_3;
-      break;
-    case 6 : //110
-      fn = ALT_6;
-      break;
+    case 2 :
+    case 3 :
+    case 4 :
+    case 5 :
+    case 6 : fn = f; break;
     default : fn = ALT_UNKNOWN; break;
   }
 
   func = Py_BuildValue("i", fn);
   return func;
 }
+
+// python function value = gpio_function_name(channel)
+static PyObject *py_gpio_function_string(PyObject *self, PyObject *args)
+{
+  unsigned int gpio;
+  int channel;
+  int f;
+  int fn;
+  char *str;
+  PyObject *func;
+
+  if (!PyArg_ParseTuple(args, "i", &channel))
+    return NULL;
+
+  if (get_gpio_number(channel, &gpio))
+    return NULL;
+
+  if (mmap_gpio_mem())
+    return NULL;
+
+  f = gpio_function(gpio);
+
+  fn = gpio_function_name(gpio,f,board_type);
+
+  str = FUNCTIONS[fn];
+
+  func = Py_BuildValue("s", str);
+  return func;
+}
+
 // python function cleanup(channel=None)
 static PyObject *py_cleanup(PyObject *self, PyObject *args, PyObject *kwargs)
 {
@@ -639,7 +673,8 @@ PyMethodDef opi_gpio_methods[] = {
   {"cleanup", (PyCFunction)py_cleanup, METH_VARARGS | METH_KEYWORDS, "Clean up by resetting all GPIO channels that have been used by this program to INPUT with no pullup/pulldown and no event detection\n[channel] - individual channel to clean up.  Default - clean every channel that has been used."},
   {"output", py_output_gpio, METH_VARARGS, "Output to a GPIO channel\nchannel - either board pin number or BCM number depending on which mode is set.\nvalue   - 0/1 or False/True or LOW/HIGH"},
   {"input", py_input_gpio, METH_VARARGS, "Input from a GPIO channel.  Returns HIGH=1=True or LOW=0=False\nchannel - either board pin number or BCM number depending on which mode is set."},
-  {"gpio_function", py_gpio_function, METH_VARARGS, "Return the current GPIO function (IN, OUT, PWM, SERIAL, I2C, SPI)\nchannel - either board pin number or GPIO number depending on which mode is set."},
+  {"gpio_function", py_gpio_function, METH_VARARGS, "Return the current GPIO function (IN, OUT, Multiplexing function ID)\nchannel - either board pin number or GPIO number depending on which mode is set."},
+  {"gpio_function_name", py_gpio_function_string, METH_VARARGS, "Return the current GPIO function (IN, OUT, Multiplexing function) as string\nchannel - either board pin number or GPIO number depending on which mode is set."},
   {"add_event_detect", (PyCFunction)py_add_event_detect, METH_VARARGS | METH_KEYWORDS, "Enable edge detection events for a particular GPIO channel.\nchannel      - either board pin number or BCM number depending on which mode is set.\nedge         - RISING, FALLING or BOTH\n[callback]   - A callback function for the event (optional)\n[bouncetime] - Switch bounce timeout in ms for callback"},
   {"remove_event_detect", py_remove_event_detect, METH_VARARGS, "Remove edge detection for a particular GPIO channel\nchannel - either board pin number or BCM number depending on which mode is set."},
   {"event_detected", py_event_detected, METH_VARARGS, "Returns True if an edge has occured on a given GPIO.  You need to enable edge detection using add_event_detect() first.\nchannel - either board pin number or BCM number depending on which mode is set."},

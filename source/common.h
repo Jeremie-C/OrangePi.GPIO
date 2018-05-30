@@ -22,17 +22,17 @@ SOFTWARE.
 
 #define BOARD_UNKNOWN  -1
 #define ZERO            1
-#define ZEROPLUS        1
-#define ZEROPLUS2H5     1
 #define R1              1
-#define ZEROPLUS2H3     2
-#define PC              3
-#define PCPLUS          3
-#define ONE             3
-#define LITE            3
-#define PLUS2E          3
-#define PC2             4
-#define PRIME           5
+#define ZEROPLUS        2 // H5 => same as 1 but different ALT function
+#define ZEROPLUS2H5     2 // H5 => same as 1 but different ALT function
+#define ZEROPLUS2H3     3
+#define PC              4
+#define PCPLUS          4
+#define ONE             4
+#define LITE            4
+#define PLUS2E          4
+#define PC2             5
+#define PRIME           6
 
 #define MODE_UNKNOWN   -1
 #define BOARD          10
@@ -40,9 +40,6 @@ SOFTWARE.
 #define MODE_SOC       12
 
 #define ALT_UNKNOWN    -1
-#define ALT_2          2
-#define ALT_3          3
-#define ALT_6          6
 
 int board_type;
 int gpio_mode;

@@ -40,6 +40,7 @@ PyObject *soc;
 PyObject *version;
 PyObject *bunknown;
 PyObject *bzeroh2;
+PyObject *bzeroh5;
 PyObject *bzeroplus3;
 PyObject *bpc;
 PyObject *bpc2;
