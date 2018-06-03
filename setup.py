@@ -33,10 +33,15 @@ classifiers = ['Development Status :: 3 - Alpha',
                'Topic :: Home Automation',
                'Topic :: System :: Hardware']
 
-setup(name             = 'OPi.GPIO',
+with open("README.md", "r") as fh:
+      long_description = fh.read()
+
+setup(name             = 'OrangePi.GPIO',
       version          = '0.6.3',
       author           = 'Jeremie-C',
       description      = 'A module to control OrangePi GPIO channels',
+      long_description=long_description,
+      long_description_content_type="text/markdown",
       license          = 'MIT',
       keywords         = 'OrangePi GPIO',
       url              = 'https://github.com/Jeremie-C/OrangePi.GPIO',

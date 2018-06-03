@@ -50,17 +50,29 @@ int is_valid_raw_port(int channel)
 
 int get_gpio_number(int channel, unsigned int *gpio)
 {
-	// check channel number is in range
+  // check channel number is in range
 	if ( (gpio_mode == BCM && (channel < 0 || channel > 27))
 	|| (gpio_mode == BOARD && (channel < 1 || channel > 40)) )
 	{
 		PyErr_SetString(PyExc_ValueError, "The channel sent is invalid");
 		return 4;
 	}
+  // Mode BCM
+  if (gpio_mode == BCM)
+  {
+    unsigned int i;
+    for (i=0; i < 41; i++)
+    {
+      if (*(phys_To_BCM + i) == channel) {
+        channel = i;  // Set channel to BOARD PIN
+        break;
+      }
+    }
+  }
   // Mode BOARD
-  if (gpio_mode == BOARD)
+  if (gpio_mode == BOARD || gpio_mode == BCM )
 	{
-		if (*(*pin_to_gpio + channel) == -1)
+    if (*(*pin_to_gpio + channel) == -1)
 		{
 			PyErr_SetString(PyExc_ValueError, "The channel sent is invalid");
 			return 5;
@@ -69,17 +81,6 @@ int get_gpio_number(int channel, unsigned int *gpio)
 		{
 			*gpio = *(*pin_to_gpio + channel);	//pin_to_gpio is initialized in py_gpio.c, the last several lines
 		}
-  }
-  // Mode BCM
-  else if (gpio_mode == BCM)
-	{
-    unsigned int i;
-    for (i=0; i < 41; i++)
-    {
-      if (*(phys_To_BCM + i) == channel) {
-        *gpio = *(*pin_to_gpio + i);
-      }
-    }
   }
   // Mode SOC
   else if (gpio_mode == MODE_SOC)

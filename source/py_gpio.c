@@ -214,7 +214,7 @@ static PyObject *py_setup_channel(PyObject *self, PyObject *args, PyObject *kwar
 
   func = gpio_function(gpio);
   /* Prevent Break of SPI, TWI, UART,... */
-  if (func != 0 && func != 1) {
+  if (func != 0 && func != 1 && func != 7) {
     fn = gpio_function_name(gpio, func, board_type);
     PyErr_Format(PyExc_ValueError, "This channel is already in use by system as %s.", FUNCTIONS[fn]);
     return NULL;
@@ -319,7 +319,8 @@ static PyObject *py_gpio_function(PyObject *self, PyObject *args)
     case 3 :
     case 4 :
     case 5 :
-    case 6 : fn = f; break;
+    case 6 :
+    case 7 : fn = f; break;
     default : fn = ALT_UNKNOWN; break;
   }
 

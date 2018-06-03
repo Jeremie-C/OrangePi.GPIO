@@ -145,7 +145,8 @@ const char* FUNCTIONS[] = {
   "UART2_TX","UART2_RX","UART2_RTS","UART2_CTS",      // 27-30
   "UART3_TX","UART3_RX","UART3_RTS","UART3_CTS",      // 31-34
   "S_UART_TX","S_UART_RX",                            // 35-36
-  "PWM0","PWM1","S_PWM"                               // 37-39
+  "PWM0","PWM1","S_PWM",                              // 37-39
+  "IO DISABLED"
 };
 
 /* Get Alt Function Name */
@@ -227,6 +228,7 @@ int gpio_function_name(int gpio, int func, int board)
       break;
     case 5 : str = 2; break;
     case 6 : str = 4; break;
+    case 7 : str = 40; break;
     default : str = 3; break;
   }
   return str;
